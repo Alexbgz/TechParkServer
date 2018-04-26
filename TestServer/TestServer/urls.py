@@ -14,11 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
 from django.conf.urls import url, include
 from TestAPI import views
+from rest_framework.authtoken.views import obtain_auth_token
+
+#Раздача картинок
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    url(r'^test/$', views.TestList.as_view()),
-]
+                  url(r'^admin/', admin.site.urls),
+                  url(r'^api-token-auth/', obtain_auth_token),
+
+                  url(r'^user/create$', views.UserCreate.as_view()),
+                  url(r'^user/(?P<username>[0-9a-zA-Z_-]+)$', views.UserDetail.as_view(), name='user-detail'),
+                  url(r'^user/(?P<username>[0-9a-zA-Z_-]+)/update$', views.UserUpdate.as_view(), name='user-detail'),
+
+                  url(r'^test$', views.TestList.as_view()),
+                  url(r'^test/create$', views.TestCreate.as_view()),
+                  url(r'^test/(?P<id>\d+)$', views.TestDetail.as_view(), name='test-detail'),
+                  #url(r'^test/(?P<id>\d+)/update$', views.TestUpdate.as_view(), name='test-detail'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
