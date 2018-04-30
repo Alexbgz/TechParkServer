@@ -36,20 +36,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return super(UserCreateSerializer, self).update(instance, validated_data)
 
 
-class TestCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Test
-        fields = ('id', 'title', 'description', 'image', 'date')
-
-    def pre_save(self, obj):
-        """Force author to the current user on save"""
-        obj.author = self.request.user
-        return obj
-
-
 class TestSerializer(serializers.ModelSerializer):
-    # author = serializers.HyperlinkedRelatedField(read_only=True, view_name='user-detail', lookup_field='username')
-    author = UserDetailSerializer()
+    author = UserDetailSerializer(read_only=True)
 
     class Meta:
         model = Test
@@ -68,13 +56,35 @@ class AnswerSerializer(serializers.ModelSerializer):
         fields = ('id', 'question', 'answer_text')
 
 
-class UserTestSerializer(serializers.ModelSerializer):
+class UserTestCreateSerializer(serializers.ModelSerializer):
+    user = UserDetailSerializer(read_only=True)
+
     class Meta:
         model = UserTest
         fields = ('id', 'user', 'test', 'score')
 
 
+class UserTestSerializer(serializers.ModelSerializer):
+    user = UserDetailSerializer(read_only=True)
+    test = TestSerializer(read_only=True)
+
+    class Meta:
+        model = UserTest
+        fields = ('id', 'user', 'test', 'score')
+
+
+class UserAnswerCreateSerializer(serializers.ModelSerializer):
+    user = UserDetailSerializer(read_only=True)
+
+    class Meta:
+        model = UserAnswer
+        fields = ('id', 'user', 'question', 'answer')
+
+
 class UserAnswerSerializer(serializers.ModelSerializer):
+    user = UserDetailSerializer(read_only=True)
+    question = QuestionSerializer(read_only=True)
+
     class Meta:
         model = UserAnswer
         fields = ('id', 'user', 'question', 'answer')
